@@ -2,21 +2,20 @@ package com.bd.socialnetwork;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "")
 public class UserController {
-    @Autowired
     private final MongoTemplate mongoTemplate;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserController(MongoTemplate mongoTemplate) {
+    public UserController(MongoTemplate mongoTemplate, UserRepository userRepository) {
         this.mongoTemplate = mongoTemplate;
+        this.userRepository = userRepository;
     }
 
     @RequestMapping("")
@@ -24,8 +23,13 @@ public class UserController {
         return "index";
     }
 
+    @PostMapping("/addUser")
+    public UserEntity addUser(@RequestBody UserEntity user) {
+        return userRepository.save(user);
+    }
+
     @GetMapping("getAllUsers")
     public List<UserEntity> getAllUsers() {
-        return mongoTemplate.findAll(UserEntity.class);
+        return userRepository.findAll();
     }
 }

@@ -9,7 +9,17 @@ public class UserEntity {
     private long id;
     private String login;
     private String password;
+    private String description;
     private String picture;
+
+    public UserEntity(long id, String login, String password, String description, String picture) {
+        super();
+        this.id = id;
+        this.login = login;
+        this.description = description;
+        this.password = password;
+        this.picture = picture;
+    }
 
     public long getId() {
         return id;
@@ -33,6 +43,14 @@ public class UserEntity {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getPicture() {
