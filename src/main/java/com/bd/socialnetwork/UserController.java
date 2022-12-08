@@ -18,13 +18,11 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @RequestMapping("")
-    public String home() {
-        return "index";
-    }
-
     @PostMapping("/addUser")
     public UserEntity addUser(@RequestBody UserEntity user) {
+        if (userRepository.existsUserEntityByLogin(user.getLogin())) {
+            throw new ExistingLoginException("Le login existe déjà");
+        }
         return userRepository.save(user);
     }
 

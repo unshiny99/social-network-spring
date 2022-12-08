@@ -2,11 +2,13 @@ package com.bd.socialnetwork;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.repository.query.Param;
 
 @Document
 public class UserEntity {
     @Id
     private long id;
+    // TODO : declare this field as unique
     private String login;
     private String password;
     private String description;
