@@ -89,4 +89,36 @@ public class UserController {
             return userFriends;
         }
     }
+
+    @PatchMapping("removeFriend")
+    public ResponseEntity removeFriend(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
+        UserEntity user1 = userRepository.findByLogin(loginUser1);
+        UserEntity user2 = userRepository.findByLogin(loginUser2);
+        if (!user1.getFriends().contains(loginUser2) && !user2.getFriends().contains(loginUser1)) {
+            throw new ExistingException("La relation d'amitié n'existe pas.");
+        } else if (user1.getFriends().contains(loginUser2) && !user2.getFriends().contains(loginUser1)) {
+            //throw new ExistingException("La relation d'amitié existe dans un sens.");
+            List<String> friendsUser1 = user1.getFriends();
+            friendsUser1.remove(loginUser2);
+            user1.setFriends(friendsUser1);
+            userRepository.save(user1);
+        } else if(!user1.getFriends().contains(loginUser2) && user2.getFriends().contains(loginUser1)) {
+            List<String> friendsUser2 = user2.getFriends();
+            friendsUser2.remove(loginUser1);
+            user2.setFriends(friendsUser2);
+            userRepository.save(user2);
+        } else {
+            // all this should be a transaction
+            List<String> friendsUser1 = user1.getFriends();
+            friendsUser1.remove(loginUser2);
+            user1.setFriends(friendsUser1);
+            userRepository.save(user1);
+
+            List<String> friendsUser2 = user2.getFriends();
+            friendsUser2.remove(loginUser1);
+            user2.setFriends(friendsUser2);
+            userRepository.save(user2);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("Relation d'amitié supprimée avec succès");
+    }
 }
