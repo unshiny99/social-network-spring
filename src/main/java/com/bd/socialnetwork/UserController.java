@@ -4,6 +4,7 @@ import com.bd.socialnetwork.Exception.ExistingLoginException;
 import com.bd.socialnetwork.Exception.NotFoundLoginException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +38,11 @@ public class UserController {
     }
 
     @GetMapping("getAllUsers")
-    public List<UserEntity> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserEntity> getAllUsers(@RequestParam("pageNumber") int pageNumber) {
+        Query query = new Query();
+        int pageSize = 30;
+        query.skip((long) (pageNumber-1) * pageSize);
+        query.limit(pageSize);
+        return mongoTemplate.find(query, UserEntity.class);
     }
 }
