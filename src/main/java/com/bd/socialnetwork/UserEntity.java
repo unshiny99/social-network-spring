@@ -4,15 +4,18 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.repository.query.Param;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Document
 public class UserEntity {
     @Id
     private String id;
-    // TODO : declare this field as unique
     private String login;
     private String password;
     private String description;
     private String picture;
+    private List<String> friends;
 
     public UserEntity(String login, String password, String description, String picture) {
         super();
@@ -20,6 +23,7 @@ public class UserEntity {
         this.description = description;
         this.password = password;
         this.picture = picture;
+        this.friends = new ArrayList<>(); // init friends relations
     }
 
     public String getId() {
@@ -60,5 +64,13 @@ public class UserEntity {
 
     public void setPicture(String picture) {
         this.picture = picture;
+    }
+
+    public List<String> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<String> friends) {
+        this.friends = friends;
     }
 }

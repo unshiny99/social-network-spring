@@ -22,6 +22,9 @@ import java.util.List;
 
 @SpringBootApplication
 public class SocialNetworkApplication {
+	/**
+	 * load initial user data by inserting users from JSON file
+	 */
 	public static void loadData() {
 		JSONParser jsonParser = new JSONParser();
 		try {

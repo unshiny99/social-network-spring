@@ -1,6 +1,6 @@
 package com.bd.socialnetwork;
 
-import com.bd.socialnetwork.Exception.ExistingLoginException;
+import com.bd.socialnetwork.Exception.ExistingException;
 import com.bd.socialnetwork.Exception.NotFoundLoginException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class UserControllerAdvice {
-    @ExceptionHandler(ExistingLoginException.class)
+    @ExceptionHandler(ExistingException.class)
     @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
-    public ResponseEntity<String> handleExistingLogin(ExistingLoginException exception) {
+    public ResponseEntity<String> handleExistingLogin(ExistingException exception) {
         return new ResponseEntity<>(exception.getMessage(),HttpStatus.PRECONDITION_FAILED);
     }
 
