@@ -7,27 +7,26 @@ import org.springframework.data.repository.query.Param;
 @Document
 public class UserEntity {
     @Id
-    private long id;
+    private String id;
     // TODO : declare this field as unique
     private String login;
     private String password;
     private String description;
     private String picture;
 
-    public UserEntity(long id, String login, String password, String description, String picture) {
+    public UserEntity(String login, String password, String description, String picture) {
         super();
-        this.id = id;
         this.login = login;
         this.description = description;
         this.password = password;
         this.picture = picture;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void String(String id) {
         this.id = id;
     }
 

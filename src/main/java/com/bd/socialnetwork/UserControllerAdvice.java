@@ -1,5 +1,7 @@
 package com.bd.socialnetwork;
 
+import com.bd.socialnetwork.Exception.ExistingLoginException;
+import com.bd.socialnetwork.Exception.NotFoundLoginException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

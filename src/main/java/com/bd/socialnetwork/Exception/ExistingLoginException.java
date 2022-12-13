@@ -1,4 +1,4 @@
-package com.bd.socialnetwork;
+package com.bd.socialnetwork.Exception;
 
 public class ExistingLoginException extends RuntimeException {
     public ExistingLoginException(String message) {

@@ -1,5 +1,7 @@
 package com.bd.socialnetwork;
 
+import com.bd.socialnetwork.Exception.ExistingLoginException;
+import com.bd.socialnetwork.Exception.NotFoundLoginException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;

@@ -1,4 +1,4 @@
-package com.bd.socialnetwork;
+package com.bd.socialnetwork.Exception;
 
 public class NotFoundLoginException extends RuntimeException {
     public NotFoundLoginException(String message) {
