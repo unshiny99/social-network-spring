@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 @RestController
 @RequestMapping(path = "")
@@ -42,11 +44,33 @@ public class UserController {
 
     @GetMapping("getAllUsers")
     public List<UserEntity> getAllUsers(@RequestParam("pageNumber") int pageNumber) {
+        initFriends();
         Query query = new Query();
         int pageSize = 30;
         query.skip((long) (pageNumber-1) * pageSize);
         query.limit(pageSize);
         return mongoTemplate.find(query, UserEntity.class);
+    }
+
+    public void initFriends() {
+        Random random = new Random();
+        for (UserEntity user : userRepository.findAll()) {
+            // Generates random integers 0 to 49
+            int numberFriends = random.nextInt(17)+3;
+            List<String> friends = new ArrayList<>();
+            for (int i=0; i<numberFriends; i++) {
+                List<UserEntity> allUsers = userRepository.findAll();
+                int numberUser = random.nextInt(allUsers.size());
+                UserEntity userToAdd = allUsers.get(numberUser);
+                if (!friends.contains(userToAdd.getId()) && !Objects.equals(userToAdd.getId(), user.getId())) {
+                    friends.add(userToAdd.getId());
+                } else {
+                    i--;
+                }
+            }
+            user.setFriends(friends);
+            userRepository.save(user);
+        }
     }
 
     @PatchMapping("addFriend")
