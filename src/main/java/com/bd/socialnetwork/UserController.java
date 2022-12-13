@@ -18,12 +18,20 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/addUser")
+    @PostMapping("addUser")
     public UserEntity addUser(@RequestBody UserEntity user) {
         if (userRepository.existsUserEntityByLogin(user.getLogin())) {
             throw new ExistingLoginException("Le login existe déjà");
         }
         return userRepository.save(user);
+    }
+
+    @GetMapping("getUser")
+    public UserEntity getUser(@RequestParam("login") String login) {
+        if (!userRepository.existsUserEntityByLogin(login)) {
+            throw new NotFoundLoginException("Le login n'a pas été trouvé");
+        }
+        return userRepository.findByLogin(login);
     }
 
     @GetMapping("getAllUsers")

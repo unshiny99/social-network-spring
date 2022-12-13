@@ -1,6 +1,6 @@
 package com.bd.socialnetwork;
 
-public class ExistingLoginException  extends RuntimeException {
+public class ExistingLoginException extends RuntimeException {
     public ExistingLoginException(String message) {
         super(message);
     }
