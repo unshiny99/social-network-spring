@@ -13,6 +13,7 @@ public class MessageEntity {
     private String sender;
     private String recipient;
     private LocalDateTime dateTime;
+    private boolean isRead;
 
     public MessageEntity(String message, String sender, String recipient, LocalDateTime dateTime) {
         super();
@@ -20,6 +21,7 @@ public class MessageEntity {
         this.sender = sender;
         this.recipient = recipient;
         this.dateTime = dateTime;
+        this.isRead = false;
     }
 
     public String getId() {
@@ -60,5 +62,13 @@ public class MessageEntity {
 
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
     }
 }

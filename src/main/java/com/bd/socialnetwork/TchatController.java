@@ -3,8 +3,10 @@ package com.bd.socialnetwork;
 import com.bd.socialnetwork.Entity.TchatEntity;
 import com.bd.socialnetwork.Entity.UserEntity;
 import com.bd.socialnetwork.Exception.ExistingException;
+import com.bd.socialnetwork.Exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,5 +34,19 @@ public class TchatController {
         }
         TchatEntity tchatEntity = new TchatEntity(idUser1, idUser2);
         return tchatRepository.save(tchatEntity);
+    }
+
+    @GetMapping("getTchat")
+    public TchatEntity getTchat(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
+        String idUser1 = userRepository.findByLogin(loginUser1).getId();
+        String idUser2 = userRepository.findByLogin(loginUser2).getId();
+        if(tchatRepository.findByUser1AndUser2(idUser1, idUser2) == null) {
+            if (tchatRepository.findByUser1AndUser2(idUser2, idUser1) == null) {
+                throw new NotFoundException("Le tchat n'a pas été trouvé entre ces 2 personnes");
+            } else { // tchat was found in other side
+                return tchatRepository.findByUser1AndUser2(idUser2, idUser1);
+            }
+        }
+        return tchatRepository.findByUser1AndUser2(idUser1, idUser2);
     }
 }
