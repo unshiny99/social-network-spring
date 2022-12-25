@@ -2,7 +2,6 @@ package com.bd.socialnetwork.Controller;
 
 import com.bd.socialnetwork.Entity.MessageEntity;
 import com.bd.socialnetwork.Entity.TchatEntity;
-import com.bd.socialnetwork.Entity.UserEntity;
 import com.bd.socialnetwork.Exception.NotFoundException;
 import com.bd.socialnetwork.Repository.MessageRepository;
 import com.bd.socialnetwork.Repository.TchatRepository;
@@ -11,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,17 +33,15 @@ public class MessageController {
 
     @PostMapping("addMessage")
     public ResponseEntity addMessage(@RequestBody MessageEntity message) {
-        String idUser1 = userRepository.findByLogin(message.getSender()).getId();
-        String idUser2 = userRepository.findByLogin(message.getRecipient()).getId();
-        TchatEntity tchatEntity = null;
-        if(tchatRepository.findByUser1AndUser2(idUser1, idUser2) == null) {
-            if (tchatRepository.findByUser1AndUser2(idUser2, idUser1) == null) {
+        TchatEntity tchatEntity;
+        if(tchatRepository.findByUser1AndUser2(message.getSender(), message.getRecipient()) == null) {
+            if (tchatRepository.findByUser1AndUser2(message.getRecipient(), message.getSender()) == null) {
                 throw new NotFoundException("Impossible de créer le message. Le tchat n'a pas été trouvé entre ces 2 personnes");
             } else { // tchat was found in other side
-                tchatEntity =  tchatRepository.findByUser1AndUser2(idUser2, idUser1);
+                tchatEntity =  tchatRepository.findByUser1AndUser2(message.getRecipient(), message.getSender());
             }
         } else {
-            tchatEntity = tchatRepository.findByUser1AndUser2(idUser1, idUser2);
+            tchatEntity = tchatRepository.findByUser1AndUser2(message.getSender(), message.getRecipient());
         }
         DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         message.setDateTime(LocalDateTime.now());
@@ -56,5 +51,13 @@ public class MessageController {
         tchatEntity.setMessages(messages);
         tchatRepository.save(tchatEntity);
         return ResponseEntity.status(HttpStatus.OK).body("Message ajouté avec succès");
+    }
+
+    @GetMapping("getNotReceivedMessages")
+    public List<MessageEntity> getNotReceivedMessages(@RequestParam String loginUser) {
+        String idUser = userRepository.findByLogin(loginUser).getId();
+        //return ResponseEntity.status(HttpStatus.OK).body("Messages chargés avec succès");
+        System.out.println(idUser);
+        return messageRepository.findByRecipientAndIsReceived(idUser,false);
     }
 }

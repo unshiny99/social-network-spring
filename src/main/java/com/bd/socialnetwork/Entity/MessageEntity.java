@@ -14,6 +14,7 @@ public class MessageEntity {
     private String recipient;
     private LocalDateTime dateTime;
     private boolean isRead;
+    private boolean isReceived;
 
     public MessageEntity(String message, String sender, String recipient, LocalDateTime dateTime) {
         super();
@@ -22,6 +23,7 @@ public class MessageEntity {
         this.recipient = recipient;
         this.dateTime = dateTime;
         this.isRead = false;
+        this.isReceived = false;
     }
 
     public String getId() {
@@ -70,5 +72,13 @@ public class MessageEntity {
 
     public void setRead(boolean read) {
         isRead = read;
+    }
+
+    public boolean isReceived() {
+        return isReceived;
+    }
+
+    public void setReceived(boolean received) {
+        isReceived = received;
     }
 }
