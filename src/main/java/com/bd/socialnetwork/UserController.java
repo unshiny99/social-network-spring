@@ -1,5 +1,6 @@
 package com.bd.socialnetwork;
 
+import com.bd.socialnetwork.Entity.UserEntity;
 import com.bd.socialnetwork.Exception.ExistingException;
 import com.bd.socialnetwork.Exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,7 @@
-package com.bd.socialnetwork;
+package com.bd.socialnetwork.Entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.repository.query.Param;
 
 import java.util.ArrayList;
 import java.util.List;

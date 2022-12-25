@@ -1,0 +1,10 @@
+package com.bd.socialnetwork;
+
+import com.bd.socialnetwork.Entity.TchatEntity;
+import com.bd.socialnetwork.Entity.UserEntity;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface TchatRepository extends MongoRepository<TchatEntity, Long> {
+    boolean existsUserEntityByUser1(String login);
+    boolean existsUserEntityByUser2(String login);
+}
