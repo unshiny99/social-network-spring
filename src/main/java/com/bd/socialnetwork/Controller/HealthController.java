@@ -1,4 +1,4 @@
-package com.bd.socialnetwork;
+package com.bd.socialnetwork.Controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

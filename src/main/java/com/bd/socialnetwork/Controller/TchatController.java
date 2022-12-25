@@ -1,9 +1,10 @@
-package com.bd.socialnetwork;
+package com.bd.socialnetwork.Controller;
 
 import com.bd.socialnetwork.Entity.TchatEntity;
-import com.bd.socialnetwork.Entity.UserEntity;
 import com.bd.socialnetwork.Exception.ExistingException;
 import com.bd.socialnetwork.Exception.NotFoundException;
+import com.bd.socialnetwork.Repository.TchatRepository;
+import com.bd.socialnetwork.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.GetMapping;

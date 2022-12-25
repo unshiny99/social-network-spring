@@ -1,4 +1,4 @@
-package com.bd.socialnetwork;
+package com.bd.socialnetwork.Repository;
 
 import com.bd.socialnetwork.Entity.UserEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;

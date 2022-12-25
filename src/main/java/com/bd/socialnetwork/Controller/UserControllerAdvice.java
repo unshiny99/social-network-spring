@@ -1,4 +1,4 @@
-package com.bd.socialnetwork;
+package com.bd.socialnetwork.Controller;
 
 import com.bd.socialnetwork.Exception.ExistingException;
 import com.bd.socialnetwork.Exception.NotFoundException;
