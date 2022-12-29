@@ -15,6 +15,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -56,6 +59,6 @@ public class SocialNetworkApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SocialNetworkApplication.class, args);
-		loadData();
+		//loadData();
 	}
 }
