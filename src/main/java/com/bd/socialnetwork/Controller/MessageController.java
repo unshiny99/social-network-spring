@@ -32,7 +32,7 @@ public class MessageController {
     }
 
     @PostMapping("addMessage")
-    public ResponseEntity addMessage(@RequestBody MessageEntity message) {
+    public ResponseEntity<String> addMessage(@RequestBody MessageEntity message) {
         TchatEntity tchatEntity;
         if(tchatRepository.findByUser1AndUser2(message.getSender(), message.getRecipient()) == null) {
             if (tchatRepository.findByUser1AndUser2(message.getRecipient(), message.getSender()) == null) {
@@ -55,7 +55,7 @@ public class MessageController {
 
     @GetMapping("getNotReceivedMessages")
     public List<MessageEntity> getNotReceivedMessages(@RequestParam String loginUser) {
-        String idUser = userRepository.findByLogin(loginUser).getId();
+        String idUser = userRepository.findByLoginIgnoreCase(loginUser).getId();
         //return ResponseEntity.status(HttpStatus.OK).body("Messages chargés avec succès");
         System.out.println(idUser);
         return messageRepository.findByRecipientAndIsReceived(idUser,false);

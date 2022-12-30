@@ -11,8 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.util.Base64;
-
 @Configuration
 public class BasicAuthWebSecurityConfiguration {
     @Autowired
@@ -20,7 +18,7 @@ public class BasicAuthWebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http.authorizeHttpRequests()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()

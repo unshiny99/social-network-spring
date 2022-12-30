@@ -24,7 +24,7 @@ public class AppBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPo
 
     @Override
     public void afterPropertiesSet() {
-        setRealmName("test");
+        setRealmName("Fremeaux-Auzou-8");
         super.afterPropertiesSet();
     }
 }

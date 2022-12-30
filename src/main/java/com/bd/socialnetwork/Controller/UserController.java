@@ -30,7 +30,7 @@ public class UserController {
 
     @PostMapping("addUser")
     public UserEntity addUser(@RequestBody UserEntity user) {
-        if (userRepository.existsUserEntityByLogin(user.getLogin())) {
+        if (userRepository.existsUserEntityByLoginIgnoreCase(user.getLogin())) {
             throw new ExistingException("Le login existe déjà");
         }
         return userRepository.save(user);
@@ -38,10 +38,10 @@ public class UserController {
 
     @GetMapping("getUser")
     public UserEntity getUser(@RequestParam("login") String login) {
-        if (!userRepository.existsUserEntityByLogin(login)) {
+        if (!userRepository.existsUserEntityByLoginIgnoreCase(login)) {
             throw new NotFoundException("Le login n'a pas été trouvé");
         }
-        return userRepository.findByLogin(login);
+        return userRepository.findByLoginIgnoreCase(login);
     }
 
     @GetMapping("getAllUsers")
@@ -54,10 +54,14 @@ public class UserController {
         return mongoTemplate.find(query, UserEntity.class);
     }
 
+    /**
+     * generate random 3 to 17 friends relationship for each user
+     * checks if the relation doesn't exist yet and if it is not current user
+     */
     public void initFriends() {
         Random random = new Random();
         for (UserEntity user : userRepository.findAll()) {
-            // Generates random integers 0 to 49
+            // Generates random integers 0 to 20
             int numberFriends = random.nextInt(17)+3;
             List<String> friends = new ArrayList<>();
             for (int i=0; i<numberFriends; i++) {
@@ -76,9 +80,9 @@ public class UserController {
     }
 
     @PatchMapping("addFriend")
-    public ResponseEntity addFriend(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
-        UserEntity user1 = userRepository.findByLogin(loginUser1);
-        UserEntity user2 = userRepository.findByLogin(loginUser2);
+    public ResponseEntity<String> addFriend(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
+        UserEntity user1 = userRepository.findByLoginIgnoreCase(loginUser1);
+        UserEntity user2 = userRepository.findByLoginIgnoreCase(loginUser2);
         if (user1.getFriends().contains(loginUser2) && user2.getFriends().contains(loginUser1)) {
             throw new ExistingException("La relation d'amitié existe déjà.");
         } else if (user1.getFriends().contains(loginUser2) && !user2.getFriends().contains(loginUser1) ||
@@ -101,15 +105,15 @@ public class UserController {
 
     @GetMapping("getFriends")
     public List<UserEntity> getFriends(@RequestParam String loginUser) {
-        if (!userRepository.existsUserEntityByLogin(loginUser)) {
+        if (!userRepository.existsUserEntityByLoginIgnoreCase(loginUser)) {
             throw new NotFoundException("Le login n'a pas été trouvé");
         } else {
-            UserEntity user = userRepository.findByLogin(loginUser);
+            UserEntity user = userRepository.findByLoginIgnoreCase(loginUser);
             List<String> friends = user.getFriends();
 
             List<UserEntity> userFriends = new ArrayList<>();
             for(String friend : friends) {
-                UserEntity userFriend = userRepository.findByLogin(friend);
+                UserEntity userFriend = userRepository.findByLoginIgnoreCase(friend);
                 userFriends.add(userFriend);
             }
             return userFriends;
@@ -117,9 +121,9 @@ public class UserController {
     }
 
     @PatchMapping("removeFriend")
-    public ResponseEntity removeFriend(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
-        UserEntity user1 = userRepository.findByLogin(loginUser1);
-        UserEntity user2 = userRepository.findByLogin(loginUser2);
+    public ResponseEntity<String> removeFriend(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
+        UserEntity user1 = userRepository.findByLoginIgnoreCase(loginUser1);
+        UserEntity user2 = userRepository.findByLoginIgnoreCase(loginUser2);
         if (!user1.getFriends().contains(loginUser2) && !user2.getFriends().contains(loginUser1)) {
             throw new ExistingException("La relation d'amitié n'existe pas.");
         } else if (user1.getFriends().contains(loginUser2) && !user2.getFriends().contains(loginUser1)) {
@@ -146,5 +150,10 @@ public class UserController {
             userRepository.save(user2);
         }
         return ResponseEntity.status(HttpStatus.OK).body("Relation d'amitié supprimée avec succès");
+    }
+
+    @GetMapping("getUsersByDescription")
+    public List<UserEntity> getUsersByDescription(@RequestParam String description) {
+        return userRepository.findByDescriptionLikeIgnoreCase(description);
     }
 }

@@ -3,8 +3,11 @@ package com.bd.socialnetwork.Repository;
 import com.bd.socialnetwork.Entity.UserEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface UserRepository extends MongoRepository<UserEntity, Long> {
-    boolean existsUserEntityByLogin(String login);
+import java.util.List;
 
-    UserEntity findByLogin(String login);
+public interface UserRepository extends MongoRepository<UserEntity, Long> {
+    boolean existsUserEntityByLoginIgnoreCase(String login);
+
+    UserEntity findByLoginIgnoreCase(String login);
+    List<UserEntity> findByDescriptionLikeIgnoreCase(String description);
 }
