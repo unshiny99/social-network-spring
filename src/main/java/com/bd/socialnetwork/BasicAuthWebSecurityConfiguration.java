@@ -18,11 +18,11 @@ public class BasicAuthWebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests()
+        http.csrf().disable()
+                .authorizeHttpRequests()
                 .anyRequest().authenticated()
                 .and()
-                .httpBasic()
-                .authenticationEntryPoint(authenticationEntryPoint);
+                .httpBasic().authenticationEntryPoint(authenticationEntryPoint);
         return http.build();
     }
 

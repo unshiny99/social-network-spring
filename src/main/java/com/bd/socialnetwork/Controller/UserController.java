@@ -4,23 +4,33 @@ import com.bd.socialnetwork.Entity.UserEntity;
 import com.bd.socialnetwork.Exception.ExistingException;
 import com.bd.socialnetwork.Exception.NotFoundException;
 import com.bd.socialnetwork.Repository.UserRepository;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.io.FileReader;
+import java.util.*;
 
 @RestController
 @RequestMapping(path = "")
 public class UserController {
     private final MongoTemplate mongoTemplate;
     private final UserRepository userRepository;
+    @Value("#{environment['spring.security.user.name']}")
+    private String username;
+    @Value("#{environment['spring.security.user.password']}")
+    private String password;
 
     @Autowired
     public UserController(MongoTemplate mongoTemplate, UserRepository userRepository) {
@@ -38,6 +48,9 @@ public class UserController {
 
     @GetMapping("getUser")
     public UserEntity getUser(@RequestParam("login") String login) {
+        // TODO : create a postMap & patchMap to load data and init friends ?
+        loadData();
+        initFriends();
         if (!userRepository.existsUserEntityByLoginIgnoreCase(login)) {
             throw new NotFoundException("Le login n'a pas été trouvé");
         }
@@ -46,12 +59,46 @@ public class UserController {
 
     @GetMapping("getAllUsers")
     public List<UserEntity> getAllUsers(@RequestParam("pageNumber") int pageNumber) {
-        initFriends();
         Query query = new Query();
         int pageSize = 30;
         query.skip((long) (pageNumber-1) * pageSize);
         query.limit(pageSize);
         return mongoTemplate.find(query, UserEntity.class);
+    }
+
+    /**
+     * load initial user data by inserting users from given JSON file
+     */
+    public void loadData() {
+        JSONParser jsonParser = new JSONParser();
+        try {
+            String jsonPath = "src/main/resources/data/userData.json";
+            Object object = jsonParser.parse(new FileReader(jsonPath));
+
+            //convert Object to JSONObject
+            JSONObject jsonObject = (JSONObject) object;
+            //System.out.println(jsonObject.get("ctRoot"));
+            JSONArray listUsers = (JSONArray) jsonObject.get("ctRoot");
+            for (Object user : listUsers) {
+                JSONObject userObject = (JSONObject) user;
+                HttpPost post = new HttpPost("http://localhost:80/addUser");
+                StringEntity params = new StringEntity(userObject.toString());
+                post.addHeader("content-type", "application/json");
+
+                String valueToEncode = username + ":" + password;
+                String token = "Basic " + Base64.getEncoder().encodeToString(valueToEncode.getBytes());
+                post.addHeader("Authorization",token);
+                post.setEntity(params);
+                try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                    httpClient.execute(post);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -83,20 +130,20 @@ public class UserController {
     public ResponseEntity<String> addFriend(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
         UserEntity user1 = userRepository.findByLoginIgnoreCase(loginUser1);
         UserEntity user2 = userRepository.findByLoginIgnoreCase(loginUser2);
-        if (user1.getFriends().contains(loginUser2) && user2.getFriends().contains(loginUser1)) {
+        if (user1.getFriends().contains(user2.getId()) && user2.getFriends().contains(user1.getId())) {
             throw new ExistingException("La relation d'amitié existe déjà.");
-        } else if (user1.getFriends().contains(loginUser2) && !user2.getFriends().contains(loginUser1) ||
-                !user1.getFriends().contains(loginUser2) && user2.getFriends().contains(loginUser1)) {
+        } else if (user1.getFriends().contains(user2.getId()) && !user2.getFriends().contains(user1.getId()) ||
+                !user1.getFriends().contains(user2.getId()) && user2.getFriends().contains(user1.getId())) {
             throw new ExistingException("La relation d'amitié existe déjà dans un sens.");
         }
         // all this should be a transaction
         List<String> friendsUser1 = user1.getFriends();
-        friendsUser1.add(loginUser2);
+        friendsUser1.add(user2.getId());
         user1.setFriends(friendsUser1);
         userRepository.save(user1);
 
         List<String> friendsUser2 = user2.getFriends();
-        friendsUser2.add(loginUser1);
+        friendsUser2.add(user1.getId());
         user2.setFriends(friendsUser2);
         userRepository.save(user2);
 
