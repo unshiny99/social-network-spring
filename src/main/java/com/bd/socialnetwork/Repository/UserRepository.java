@@ -9,5 +9,6 @@ public interface UserRepository extends MongoRepository<UserEntity, Long> {
     boolean existsUserEntityByLoginIgnoreCase(String login);
 
     UserEntity findByLoginIgnoreCase(String login);
+    UserEntity findById(String id);
     List<UserEntity> findByDescriptionLikeIgnoreCase(String description);
 }

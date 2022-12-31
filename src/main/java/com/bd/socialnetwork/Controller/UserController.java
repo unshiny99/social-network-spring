@@ -49,8 +49,9 @@ public class UserController {
     @GetMapping("getUser")
     public UserEntity getUser(@RequestParam("login") String login) {
         // TODO : create a postMap & patchMap to load data and init friends ?
-        loadData();
-        initFriends();
+        // comment the lines below if data exists in DB
+//        loadData();
+//        initFriends();
         if (!userRepository.existsUserEntityByLoginIgnoreCase(login)) {
             throw new NotFoundException("Le login n'a pas été trouvé");
         }
@@ -130,6 +131,9 @@ public class UserController {
     public ResponseEntity<String> addFriend(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
         UserEntity user1 = userRepository.findByLoginIgnoreCase(loginUser1);
         UserEntity user2 = userRepository.findByLoginIgnoreCase(loginUser2);
+        if (user1 == null || user2 == null) {
+            throw new NotFoundException("Un des utilisateurs n'a pas été trouvé.");
+        }
         if (user1.getFriends().contains(user2.getId()) && user2.getFriends().contains(user1.getId())) {
             throw new ExistingException("La relation d'amitié existe déjà.");
         } else if (user1.getFriends().contains(user2.getId()) && !user2.getFriends().contains(user1.getId()) ||
@@ -151,17 +155,18 @@ public class UserController {
     }
 
     @GetMapping("getFriends")
-    public List<UserEntity> getFriends(@RequestParam String loginUser) {
+    public List<Optional<UserEntity>> getFriends(@RequestParam String loginUser) {
         if (!userRepository.existsUserEntityByLoginIgnoreCase(loginUser)) {
             throw new NotFoundException("Le login n'a pas été trouvé");
         } else {
             UserEntity user = userRepository.findByLoginIgnoreCase(loginUser);
             List<String> friends = user.getFriends();
+            System.out.println(friends);
 
-            List<UserEntity> userFriends = new ArrayList<>();
+            List<Optional<UserEntity>> userFriends = new ArrayList<>();
             for(String friend : friends) {
-                UserEntity userFriend = userRepository.findByLoginIgnoreCase(friend);
-                userFriends.add(userFriend);
+                UserEntity userFriend = userRepository.findById(friend);
+                userFriends.add(Optional.ofNullable(userFriend));
             }
             return userFriends;
         }
@@ -171,15 +176,18 @@ public class UserController {
     public ResponseEntity<String> removeFriend(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
         UserEntity user1 = userRepository.findByLoginIgnoreCase(loginUser1);
         UserEntity user2 = userRepository.findByLoginIgnoreCase(loginUser2);
-        if (!user1.getFriends().contains(loginUser2) && !user2.getFriends().contains(loginUser1)) {
+        if (user1 == null || user2 == null) {
+            throw new NotFoundException("Un des utilisateurs n'a pas été trouvé.");
+        }
+        if (!user1.getFriends().contains(user2.getId()) && !user2.getFriends().contains(user1.getId())) {
             throw new ExistingException("La relation d'amitié n'existe pas.");
-        } else if (user1.getFriends().contains(loginUser2) && !user2.getFriends().contains(loginUser1)) {
+        } else if (user1.getFriends().contains(user2.getId()) && !user2.getFriends().contains(user1.getId())) {
             //throw new ExistingException("La relation d'amitié existe dans un sens.");
             List<String> friendsUser1 = user1.getFriends();
             friendsUser1.remove(loginUser2);
             user1.setFriends(friendsUser1);
             userRepository.save(user1);
-        } else if(!user1.getFriends().contains(loginUser2) && user2.getFriends().contains(loginUser1)) {
+        } else if(!user1.getFriends().contains(user2.getId()) && user2.getFriends().contains(user1.getId())) {
             List<String> friendsUser2 = user2.getFriends();
             friendsUser2.remove(loginUser1);
             user2.setFriends(friendsUser2);
@@ -187,12 +195,12 @@ public class UserController {
         } else {
             // all this should be a transaction
             List<String> friendsUser1 = user1.getFriends();
-            friendsUser1.remove(loginUser2);
+            friendsUser1.remove(user2.getId());
             user1.setFriends(friendsUser1);
             userRepository.save(user1);
 
             List<String> friendsUser2 = user2.getFriends();
-            friendsUser2.remove(loginUser1);
+            friendsUser2.remove(user1.getId());
             user2.setFriends(friendsUser2);
             userRepository.save(user2);
         }
