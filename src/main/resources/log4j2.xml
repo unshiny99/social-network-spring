@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <CustomLevels>
+        <CustomLevel name="DIAG" intLevel="350" /> <!-- between INFO & WARN -->
+    </CustomLevels>
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+        <File name="FileAppender" fileName="logs/test.log">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+<!--        <NoSql name="MongoDbAppender">-->
+<!--            <MongoDb4 connection="mongodb://localhost:27017/my_database.testCollection" />-->
+<!--        </NoSql>-->
+    </Appenders>
+    <Loggers>
+<!--        <Logger></Logger>-->
+        <Root level="all">
+            <AppenderRef ref="ConsoleAppender" level="info"/>
+            <AppenderRef ref="FileAppender" level="diag"/>
+            <!--            <AppenderRef ref="MongoDbAppender"/>-->
+        </Root>
+    </Loggers>
+</Configuration>

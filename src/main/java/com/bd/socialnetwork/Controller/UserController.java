@@ -8,6 +8,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -31,6 +34,7 @@ public class UserController {
     private String username;
     @Value("#{environment['spring.security.user.password']}")
     private String password;
+    private static final Logger logger = LogManager.getLogger(UserController.class);
 
     @Autowired
     public UserController(MongoTemplate mongoTemplate, UserRepository userRepository) {
@@ -43,6 +47,8 @@ public class UserController {
         if (userRepository.existsUserEntityByLoginIgnoreCase(user.getLogin())) {
             throw new ExistingException("Le login existe déjà");
         }
+        //logger.info("Un utilisateur a été ajouté : {}", user::toString);
+        logger.log(Level.getLevel("DIAG"), "Un utilisateur a été ajouté : {}", user::toString);
         return userRepository.save(user);
     }
 

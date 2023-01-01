@@ -72,4 +72,16 @@ public class UserEntity {
     public void setFriends(List<String> friends) {
         this.friends = friends;
     }
+
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "id='" + id + '\'' +
+                ", login='" + login + '\'' +
+                ", password='" + password + '\'' +
+                ", description='" + description + '\'' +
+                ", picture='" + picture + '\'' +
+                ", friends=" + friends +
+                '}';
+    }
 }
