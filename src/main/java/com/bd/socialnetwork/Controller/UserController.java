@@ -1,8 +1,10 @@
 package com.bd.socialnetwork.Controller;
 
+import com.bd.socialnetwork.Entity.PostEntity;
 import com.bd.socialnetwork.Entity.UserEntity;
 import com.bd.socialnetwork.Exception.ExistingException;
 import com.bd.socialnetwork.Exception.NotFoundException;
+import com.bd.socialnetwork.Repository.PostRepository;
 import com.bd.socialnetwork.Repository.UserRepository;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -30,6 +32,7 @@ import java.util.*;
 public class UserController {
     private final MongoTemplate mongoTemplate;
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
     @Value("#{environment['spring.security.user.name']}")
     private String username;
     @Value("#{environment['spring.security.user.password']}")
@@ -37,19 +40,20 @@ public class UserController {
     private static final Logger logger = LogManager.getLogger(UserController.class);
 
     @Autowired
-    public UserController(MongoTemplate mongoTemplate, UserRepository userRepository) {
+    public UserController(MongoTemplate mongoTemplate, UserRepository userRepository, PostRepository postRepository) {
         this.mongoTemplate = mongoTemplate;
         this.userRepository = userRepository;
+        this.postRepository = postRepository;
     }
 
     @PostMapping("addUser")
-    public UserEntity addUser(@RequestBody UserEntity user) {
+    public ResponseEntity<String> addUser(@RequestBody UserEntity user) {
         if (userRepository.existsUserEntityByLoginIgnoreCase(user.getLogin())) {
             throw new ExistingException("Le login existe déjà");
         }
-        //logger.info("Un utilisateur a été ajouté : {}", user::toString);
+        userRepository.save(user);
         logger.log(Level.getLevel("DIAG"), "Un utilisateur a été ajouté : {}", user::toString);
-        return userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.OK).body("Utilisateur ajouté avec succès");
     }
 
     @GetMapping("getUser")
@@ -167,7 +171,6 @@ public class UserController {
         } else {
             UserEntity user = userRepository.findByLoginIgnoreCase(loginUser);
             List<String> friends = user.getFriends();
-            System.out.println(friends);
 
             List<Optional<UserEntity>> userFriends = new ArrayList<>();
             for(String friend : friends) {
@@ -216,5 +219,28 @@ public class UserController {
     @GetMapping("getUsersByDescription")
     public List<UserEntity> getUsersByDescription(@RequestParam String description) {
         return userRepository.findByDescriptionLikeIgnoreCase(description);
+    }
+
+    @GetMapping("getActu")
+    public List<PostEntity> getActu(@RequestParam String loginUser) {
+        List<PostEntity> posts = new ArrayList<>();
+        if (!userRepository.existsUserEntityByLoginIgnoreCase(loginUser)) {
+            throw new NotFoundException("Le login n'a pas été trouvé");
+        } else {
+            UserEntity user = userRepository.findByLoginIgnoreCase(loginUser);
+            List<String> friends = user.getFriends();
+
+            for(String friend : friends) {
+                UserEntity userFriend = userRepository.findById(friend);
+                posts.addAll(postRepository.findAllByUser(userFriend.getId()));
+            }
+        }
+        // sort the list by date DESC
+        posts.sort(new Comparator<PostEntity>() {
+            public int compare(PostEntity m1, PostEntity m2) {
+                return m2.getDateTime().compareTo(m1.getDateTime());
+            }
+        });
+        return posts;
     }
 }

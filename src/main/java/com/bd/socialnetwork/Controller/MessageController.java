@@ -56,8 +56,6 @@ public class MessageController {
     @GetMapping("getNotReceivedMessages")
     public List<MessageEntity> getNotReceivedMessages(@RequestParam String loginUser) {
         String idUser = userRepository.findByLoginIgnoreCase(loginUser).getId();
-        //return ResponseEntity.status(HttpStatus.OK).body("Messages chargés avec succès");
-        System.out.println(idUser);
         return messageRepository.findByRecipientAndIsReceived(idUser,false);
     }
 }
