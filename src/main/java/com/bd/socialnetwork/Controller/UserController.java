@@ -60,8 +60,8 @@ public class UserController {
     public UserEntity getUser(@RequestParam("login") String login) {
         // TODO : create a postMap & patchMap to load data and init friends ?
         // comment the lines below if data exists in DB
-//        loadData();
-//        initFriends();
+        loadData();
+        initFriends();
         if (!userRepository.existsUserEntityByLoginIgnoreCase(login)) {
             throw new NotFoundException("Le login n'a pas été trouvé");
         }

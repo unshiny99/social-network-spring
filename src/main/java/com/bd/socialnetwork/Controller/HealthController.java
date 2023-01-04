@@ -19,8 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthController {
     @GetMapping(path = "mongo")
     public ResponseEntity<String> getMongo() {
-        // Replace the uri string with your MongoDB deployment's connection string
-        String uri = "mongodb://localhost:27017";
+        // TODO : Replace the uri string with your MongoDB deployment's connection string
+        // add env vars to not do errors...
+        String uri = "mongodb://10.200.0.5:27016";
         try (MongoClient mongoClient = MongoClients.create(uri)) {
             MongoDatabase database = mongoClient.getDatabase("admin");
             try {
