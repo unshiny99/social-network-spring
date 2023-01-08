@@ -6,6 +6,9 @@ import com.bd.socialnetwork.Exception.NotFoundException;
 import com.bd.socialnetwork.Repository.MessageRepository;
 import com.bd.socialnetwork.Repository.TchatRepository;
 import com.bd.socialnetwork.Repository.UserRepository;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,7 @@ public class MessageController {
     private final MessageRepository messageRepository;
     private final TchatRepository tchatRepository;
     private final UserRepository userRepository;
+    private static final Logger logger = LogManager.getLogger(MessageController.class);
 
     @Autowired
     public MessageController(MongoTemplate mongoTemplate, MessageRepository messageRepository, TchatRepository tchatRepository, UserRepository userRepository) {
@@ -56,6 +60,7 @@ public class MessageController {
     @GetMapping("getNotReceivedMessages")
     public List<MessageEntity> getNotReceivedMessages(@RequestParam String loginUser) {
         String idUser = userRepository.findByLoginIgnoreCase(loginUser).getId();
+        logger.log(Level.getLevel("DIAG"), "Demande messages non reçus : {}", idUser);
         return messageRepository.findByRecipientAndIsReceived(idUser,false);
     }
 }
