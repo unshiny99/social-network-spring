@@ -52,19 +52,20 @@ public class UserController {
             throw new ExistingException("Le login existe déjà");
         }
         userRepository.save(user);
-        logger.log(Level.getLevel("DIAG"), "Un utilisateur a été ajouté : {}", user::toString);
+        logger.log(Level.getLevel("DIAG"), "Un utilisateur a été ajouté : {}", user.getId());
         return ResponseEntity.status(HttpStatus.OK).body("Utilisateur ajouté avec succès");
     }
 
     @GetMapping("getUser")
     public UserEntity getUser(@RequestParam("login") String login) {
-        // TODO : create a postMap & patchMap to load data and init friends ?
+        // feature : create a postMap & patchMap to load data and init friends ?
         // comment the lines below if data exists in DB
-        loadData();
-        initFriends();
+//        loadData();
+//        initFriends();
         if (!userRepository.existsUserEntityByLoginIgnoreCase(login)) {
             throw new NotFoundException("Le login n'a pas été trouvé");
         }
+        logger.log(Level.getLevel("DIAG"), "Un utilisateur a été recherché : {}", userRepository.findByLoginIgnoreCase(login).getId());
         return userRepository.findByLoginIgnoreCase(login);
     }
 
@@ -161,6 +162,7 @@ public class UserController {
         user2.setFriends(friendsUser2);
         userRepository.save(user2);
 
+        logger.log(Level.getLevel("DIAG"), "Une relation d'amitié a été ajoutée, entre {} et {}", user1.getId(), user2.getId());
         return ResponseEntity.status(HttpStatus.OK).body("Relation d'amitié ajoutée avec succès");
     }
 
@@ -177,6 +179,8 @@ public class UserController {
                 UserEntity userFriend = userRepository.findById(friend);
                 userFriends.add(Optional.ofNullable(userFriend));
             }
+
+            logger.log(Level.getLevel("DIAG"), "Un accès aux amis a été réalisé : {}", user.getId());
             return userFriends;
         }
     }
@@ -213,6 +217,7 @@ public class UserController {
             user2.setFriends(friendsUser2);
             userRepository.save(user2);
         }
+        logger.log(Level.getLevel("DIAG"), "Une relation d'amitié a été supprimée, entre {} et {}", user1.getId(), user2.getId());
         return ResponseEntity.status(HttpStatus.OK).body("Relation d'amitié supprimée avec succès");
     }
 
@@ -234,6 +239,7 @@ public class UserController {
                 UserEntity userFriend = userRepository.findById(friend);
                 posts.addAll(postRepository.findAllByUser(userFriend.getId()));
             }
+            logger.log(Level.getLevel("DIAG"), "Une demande d'actualité a été faite pour : {}", user.getId());
         }
         // sort the list by date DESC
         posts.sort(new Comparator<PostEntity>() {

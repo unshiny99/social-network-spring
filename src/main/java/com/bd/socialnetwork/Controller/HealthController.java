@@ -1,6 +1,5 @@
 package com.bd.socialnetwork.Controller;
 
-import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -9,6 +8,7 @@ import org.bson.BsonDocument;
 import org.bson.BsonInt64;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,11 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(path = "/health")
 public class HealthController {
+    @Value("#{environment['spring.data.mongodb.host']}")
+    private String dbIp;
+    @Value("#{environment['spring.data.mongodb.port']}")
+    private String dbPort;
+
     @GetMapping(path = "mongo")
     public ResponseEntity<String> getMongo() {
         // TODO : Replace the uri string with your MongoDB deployment's connection string
         // add env vars to not do errors...
-        String uri = "mongodb://10.200.0.5:27016";
+        String uri = "mongodb://" + dbIp + ":" + dbPort;
         try (MongoClient mongoClient = MongoClients.create(uri)) {
             MongoDatabase database = mongoClient.getDatabase("admin");
             try {
