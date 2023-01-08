@@ -261,7 +261,7 @@ public class UserController {
             // first, get id of user
             UserEntity user = userRepository.findByLoginIgnoreCase(loginUser);
             String idUser = user.getId();
-            File file = new File("logs/test.log");
+            File file = new File("logs/spring.log");
             Scanner sc = null;
             try {
                 sc = new Scanner(file);
