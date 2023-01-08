@@ -24,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
 
@@ -248,5 +250,32 @@ public class UserController {
             }
         });
         return posts;
+    }
+
+    @GetMapping("getLogsUser")
+    public List<String> getLogsUser(@RequestParam("loginUser") String loginUser) {
+        List<String> logs = new ArrayList<>();
+        if (!userRepository.existsUserEntityByLoginIgnoreCase(loginUser)) {
+            throw new NotFoundException("Le login n'a pas été trouvé");
+        } else {
+            // first, get id of user
+            UserEntity user = userRepository.findByLoginIgnoreCase(loginUser);
+            String idUser = user.getId();
+            File file = new File("logs/test.log");
+            Scanner sc = null;
+            try {
+                sc = new Scanner(file);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            while (sc.hasNextLine()) {
+                //System.out.println(sc.nextLine());
+                String logLine = sc.nextLine();
+                if(logLine.contains(idUser)) {
+                    logs.add(logLine);
+                }
+            }
+        }
+        return logs;
     }
 }
