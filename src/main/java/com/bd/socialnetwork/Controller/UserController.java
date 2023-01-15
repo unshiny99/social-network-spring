@@ -83,7 +83,8 @@ public class UserController {
     /**
      * load initial user data by inserting users from given JSON file
      */
-    public void loadData() {
+    @PostMapping("loadUsers")
+    public ResponseEntity<String> loadUsers() {
         JSONParser jsonParser = new JSONParser();
         try {
             String jsonPath = "src/main/resources/data/userData.json";
@@ -91,7 +92,6 @@ public class UserController {
 
             //convert Object to JSONObject
             JSONObject jsonObject = (JSONObject) object;
-            //System.out.println(jsonObject.get("ctRoot"));
             JSONArray listUsers = (JSONArray) jsonObject.get("ctRoot");
             for (Object user : listUsers) {
                 JSONObject userObject = (JSONObject) user;
@@ -113,16 +113,18 @@ public class UserController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return ResponseEntity.status(HttpStatus.OK).body("Initilisation des utilisateurs effectuée avec succès");
     }
 
     /**
-     * generate random 3 to 17 friends relationship for each user
+     * generate random 3 to 20 friends relationship for each user
      * checks if the relation doesn't exist yet and if it is not current user
      */
-    public void initFriends() {
+    @PatchMapping("initFriends")
+    public ResponseEntity<String> initFriends() {
         Random random = new Random();
         for (UserEntity user : userRepository.findAll()) {
-            // Generates random integers 0 to 20
+            // Generates random integers 3 to 20
             int numberFriends = random.nextInt(17)+3;
             List<String> friends = new ArrayList<>();
             for (int i=0; i<numberFriends; i++) {
@@ -138,6 +140,7 @@ public class UserController {
             user.setFriends(friends);
             userRepository.save(user);
         }
+        return ResponseEntity.status(HttpStatus.OK).body("Relations d'amitié initialisées avec succès");
     }
 
     @PatchMapping("addFriend")
