@@ -33,6 +33,9 @@ public class TchatController {
     public TchatEntity addTchat(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
         String idUser1 = userRepository.findByLoginIgnoreCase(loginUser1).getId();
         String idUser2 = userRepository.findByLoginIgnoreCase(loginUser2).getId();
+        if(idUser1 == null ||idUser2 == null) {
+            throw new NotFoundException("Au moins un des deux utilisateurs n'a pas été trouvé");
+        }
         if ((tchatRepository.existsUserEntityByUser1(idUser1) && tchatRepository.existsUserEntityByUser2(idUser2))
                 || (tchatRepository.existsUserEntityByUser1(idUser2) && tchatRepository.existsUserEntityByUser2(idUser1))) {
             throw new ExistingException("Un tchat existe déjà entre ces 2 personnes");
@@ -46,6 +49,9 @@ public class TchatController {
     public TchatEntity getTchat(@RequestParam("loginUser1") String loginUser1, @RequestParam("loginUser2") String loginUser2) {
         String idUser1 = userRepository.findByLoginIgnoreCase(loginUser1).getId();
         String idUser2 = userRepository.findByLoginIgnoreCase(loginUser2).getId();
+        if(idUser1 == null ||idUser2 == null) {
+            throw new NotFoundException("Au moins un des deux utilisateurs n'a pas été trouvé");
+        }
         if(tchatRepository.findByUser1AndUser2(idUser1, idUser2) == null) {
             if (tchatRepository.findByUser1AndUser2(idUser2, idUser1) == null) {
                 throw new NotFoundException("Le tchat n'a pas été trouvé entre ces 2 personnes");
